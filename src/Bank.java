@@ -1,11 +1,15 @@
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
 import javax.swing.text.AbstractDocument.LeafElement;
+
+import com.mysql.fabric.xmlrpc.base.Data;
 
 public class Bank {
 	private AccountFactory accFactory;
@@ -91,11 +95,12 @@ public class Bank {
 		return match;
 	}
 	
-	void personalProfile(int usrID){
-		Statement statement;
-		String name;
-		String pwd;
-		String fullName;
+	void personalProfile(int usrID){		
+		Statement statement = null;
+		String name = null;
+		String pwd = null;
+		String fullName = null;
+		Scanner s = new Scanner(System.in);
 		try{
 			DBConnection dbConn = new DBConnection();
 			Connection connection = dbConn.executeDBConnection();
@@ -107,6 +112,48 @@ public class Bank {
 				pwd = rs.getString("password");
 				fullName = rs.getString("fullName");
 			}
+		}catch(Exception e){
+			System.out.println(e);
+		}
+			System.out.println("Your Profile Info");
+			System.out.println("Full Name : " + fullName);
+			System.out.println("Username : " + name);
+			System.out.println("Password : " + pwd);
+			System.out.println("\t\tEnter new Full Name : ");
+			String newFullName = s.nextLine();
+			System.out.println("Enter New Username : ");
+			String newUsername = s.nextLine();
+			System.out.println("Enter New Password : ");
+			String newPassword = s.nextLine();
+			System.out.println("\t\tYour Profile has successfully updated");
+			System.out.println("\t\tNew Profile Info");
+			System.out.println("Full Name : " + newFullName);
+			System.out.println("Username : " + newUsername);
+			System.out.println("Password : " + newPassword);
+			
+			String sql1 = "UPDATE user SET username=" + newUsername + ",password="+ newPassword +
+							",fullName=" + newFullName + " WHERE userID=" + usrID;
+			try {
+				statement.executeUpdate(sql1);
+			} catch (SQLException e) {				
+				e.printStackTrace();
+			}		
+	}
+	
+	void sendMessage(int usrID){
+		System.out.println("Enter your message");
+		Scanner s = new Scanner(System.in);
+		String message = s.nextLine();
+		Statement statement;
+		Date date = new Date();
+		try{
+			DBConnection dbConn = new DBConnection();
+			Connection connection = dbConn.executeDBConnection();
+			statement = connection.createStatement();
+			String sql = "INSERT INTO messages (userID, message, DateAndTime) VALUES ("+usrID
+							+ ",\"" +message + "\""+",\""+date +"\""+ ")";
+			System.out.println(sql);
+			statement.executeUpdate(sql);
 		}
 		catch(Exception e){
 			System.out.println(e);
